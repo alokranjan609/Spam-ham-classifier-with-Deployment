@@ -1,0 +1,35 @@
+name: CI/CD Pipeline for Flask App
+
+on:
+  push:
+    branches:
+      - main  # Runs only when code is pushed to `main`
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🚀 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10  # Use your required Python version
+
+      - name: 📥 Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+
+      - name: 📤 Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}  # Secure API Key
+          SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}  # Render Service ID
+        run: |
+          curl -X POST "https://api.render.com/v1/services/$SERVICE_ID/deploys" \
+          -H "Authorization: Bearer $RENDER_API_KEY" \
+          -H "Accept: application/json" \
+          -d ''
+
