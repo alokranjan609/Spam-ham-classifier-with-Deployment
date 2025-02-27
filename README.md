@@ -124,8 +124,8 @@ This project is **open-source** under the **MIT License**.
 ## 📩 Contact
 For any queries, feel free to reach out!
 
-📧 **Email:** [your_email@example.com](mailto:alokthakur609@gmail.com)  
-💻 **GitHub:** [Your GitHub Profile](https://github.com/alokranjan609)
+📧 **Email:** (mailto:alokthakur609@gmail.com)  
+💻 **GitHub:** (https://github.com/)
 
 ---
 
