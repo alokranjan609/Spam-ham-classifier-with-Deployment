@@ -1,15 +1,23 @@
 from flask import Flask, render_template, request
 import joblib
 import nltk
+import os
+
+# Initialize Flask app
+app = Flask(__name__)
 
 # Load the trained model and vectorizer
 model = joblib.load("spam_classifier.pkl")
 tfidf = joblib.load("tfidf_vectorizer.pkl")
 
-# Ensure NLTK punkt is downloaded
-nltk.download('punkt')
+# Ensure required NLTK data is available
+nltk.data.path.append(os.path.join(os.getcwd(), 'nltk_data'))
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt', download_dir=os.path.join(os.getcwd(), 'nltk_data'))
 
-# Preprocessing function (same as before)
+# Preprocessing function
 from nltk.corpus import stopwords
 import string
 from nltk.stem.porter import PorterStemmer
@@ -39,9 +47,6 @@ def transform_text(text):
 
     return " ".join(y)
 
-# Initialize Flask app
-app = Flask(__name__)
-
 @app.route('/')
 def home():
     return render_template("index.html")
@@ -49,13 +54,14 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     if request.method == 'POST':
-        email_text = request.form['email_text']  # Get input from form
-        transformed_text = transform_text(email_text)  # Preprocess input
-        vectorized_text = tfidf.transform([transformed_text]).toarray()  # Convert to TF-IDF
-        prediction = model.predict(vectorized_text)[0]  # Predict
-        
+        email_text = request.form['email_text']
+        transformed_text = transform_text(email_text)
+        vectorized_text = tfidf.transform([transformed_text]).toarray()
+        prediction = model.predict(vectorized_text)[0]
+
         result = "Spam" if prediction == 1 else "Not Spam"
         return render_template("index.html", email_text=email_text, prediction=result)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
